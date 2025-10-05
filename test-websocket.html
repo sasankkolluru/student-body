@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebSocket Chat Test</title>
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+</head>
+<body>
+    <h1>WebSocket Chat Test</h1>
+    <div id="messages"></div>
+    <input type="text" id="messageInput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
+    <button onclick="testConnection()">Test Connection</button>
+    
+    <script>
+        const socket = io('http://localhost:4000', {
+            path: '/socket.io/',
+            transports: ['websocket']
+        });
+
+        socket.on('connect', () => {
+            console.log('✅ Connected to server');
+            addMessage('Connected to server', 'system');
+            socket.emit('user_join', 'Test User');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('❌ Disconnected from server');
+            addMessage('Disconnected from server', 'system');
+        });
+
+        socket.on('bot_message', (data) => {
+            console.log('📥 Bot message:', data);
+            addMessage(data.text, 'bot');
+        });
+
+        socket.on('user_message', (data) => {
+            console.log('📥 User message:', data);
+            addMessage(`${data.username}: ${data.text}`, 'user');
+        });
+
+        function addMessage(text, type) {
+            const messages = document.getElementById('messages');
+            const div = document.createElement('div');
+            div.style.margin = '5px 0';
+            div.style.padding = '5px';
+            div.style.border = '1px solid #ccc';
+            div.style.borderRadius = '5px';
+            
+            if (type === 'bot') {
+                div.style.backgroundColor = '#e3f2fd';
+            } else if (type === 'user') {
+                div.style.backgroundColor = '#f3e5f5';
+            } else {
+                div.style.backgroundColor = '#fff3e0';
+            }
+            
+            div.textContent = text;
+            messages.appendChild(div);
+            messages.scrollTop = messages.scrollHeight;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const message = input.value.trim();
+            if (message) {
+                console.log('📤 Sending:', message);
+                socket.emit('user_message', message);
+                addMessage(`You: ${message}`, 'user');
+                input.value = '';
+            }
+        }
+
+        function testConnection() {
+            console.log('🧪 Testing connection...');
+            socket.emit('test_connection');
+        }
+
+        document.getElementById('messageInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

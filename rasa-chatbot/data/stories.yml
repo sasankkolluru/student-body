@@ -1,0 +1,111 @@
+version: "3.1"
+
+stories:
+- story: happy path
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_university
+  - action: utter_university_info
+  - intent: ask_about_student_bodies
+  - action: utter_student_bodies
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: sad path 1
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: mood_unhappy
+  - action: utter_iamabot
+  - intent: ask_about_help
+  - action: utter_help
+
+- story: sad path 2
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_help
+  - action: utter_help
+  - intent: ask_about_university
+  - action: utter_university_info
+
+- story: say goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- story: bot challenge
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- story: ask about rankings
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_rankings
+  - action: utter_rankings
+
+- story: ask about campus life
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_campus_life
+  - action: utter_campus_life
+
+- story: ask about events
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_events
+  - action: utter_events
+
+- story: ask about sac
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_sac
+  - action: utter_sac_info
+
+- story: ask about verticals
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_verticals
+  - action: utter_verticals
+
+- story: ask about campus spots
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_campus_spots
+  - action: utter_campus_spots
+
+- story: ask about benefits
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_benefits
+  - action: utter_benefits
+
+- story: ask about admissions
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_admissions
+  - action: utter_admissions
+
+- story: ask about achievements
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_achievements
+  - action: utter_achievements
+
+- story: ask about contact
+  steps:
+  - intent: greet
+  - action: utter_greet
+  - intent: ask_about_contact
+  - action: utter_contact

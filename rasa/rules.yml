@@ -1,0 +1,27 @@
+version: "3.1"
+
+rules:
+  - rule: Active events
+    steps:
+      - intent: events_now
+      - action: action_get_active_events
+
+  - rule: Active polls
+    steps:
+      - intent: polls_now
+      - action: action_get_active_polls
+
+  - rule: My profile
+    steps:
+      - intent: my_profile
+      - action: action_get_my_profile
+
+  - rule: My ideas
+    steps:
+      - intent: my_ideas
+      - action: action_get_my_ideas
+
+  - rule: My achievements
+    steps:
+      - intent: my_achievements
+      - action: action_get_my_achievements

@@ -1,0 +1,19 @@
+version: "3.1"
+
+intents:
+  - events_now
+  - polls_now
+  - my_profile
+  - my_ideas
+  - my_achievements
+
+actions:
+  - action_get_active_events
+  - action_get_active_polls
+  - action_get_my_profile
+  - action_get_my_ideas
+  - action_get_my_achievements
+
+responses:
+  utter_default:
+    - text: "I'm not sure I understood that. Could you rephrase?"

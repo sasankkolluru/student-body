@@ -1,0 +1,107 @@
+version: "3.1"
+
+intents:
+  - greet
+  - goodbye
+  - affirm
+  - deny
+  - mood_great
+  - mood_unhappy
+  - bot_challenge
+  - ask_about_university
+  - ask_about_student_bodies
+  - ask_about_sac
+  - ask_about_campus_life
+  - ask_about_events
+  - ask_about_rankings
+  - ask_about_admissions
+  - ask_about_benefits
+  - ask_about_campus_spots
+  - ask_about_verticals
+  - ask_about_achievements
+  - ask_about_contact
+  - ask_about_help
+
+entities:
+  - student_body
+  - vertical
+  - campus_spot
+  - event_type
+
+slots:
+  student_body:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: student_body
+  vertical:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: vertical
+  campus_spot:
+    type: text
+    mappings:
+    - type: from_entity
+      entity: campus_spot
+
+responses:
+  utter_greet:
+  - text: "Hello! I'm your Vignan University assistant. I can help you with information about student bodies, campus life, events, academic programs, and much more. What would you like to know?"
+  - text: "Hi there! Welcome to Vignan University! I'm here to help you learn about our campus, student organizations, events, and academic programs. How can I assist you today?"
+  - text: "Hey! Great to see you! I'm your Vignan University guide. I can tell you about our student bodies, famous campus spots, NIRF rankings, and more. What interests you?"
+
+  utter_goodbye:
+  - text: "Goodbye! Feel free to ask if you need any help later. Have a great day!"
+  - text: "See you later! Don't hesitate to reach out if you have more questions about Vignan University."
+
+  utter_iamabot:
+  - text: "I am a bot, powered by Rasa. I'm here to help you learn about Vignan University!"
+
+  utter_university_info:
+  - text: "Vignan University is a prestigious private university established in 2008, located in Vadlamudi, Guntur, Andhra Pradesh. We are ranked among the top 70 universities and top 80 colleges in India according to NIRF rankings. Our university offers excellent academic programs, vibrant campus life, and holistic development opportunities."
+
+  utter_student_bodies:
+  - text: "Here are the main student bodies at Vignan University:\n\n• SAC (Student Activities Council)\n• Entrepreneurship Cell\n• Vignan Sports Contingent\n• Anti-Ragging Committee\n• NCC (National Cadet Corps)\n• NSS (National Service Scheme)\n\nYou can ask about specific ones for more details!"
+
+  utter_sac_info:
+  - text: "SAC (Student Activities Council) is the umbrella body that coordinates all student-led initiatives and events. It has 8 verticals: Culturals, Literary, Fine Arts, Public Relations, Technical Design, Logistics, Stage Management, and Photography. I can tell you about any specific vertical!"
+
+  utter_campus_life:
+  - text: "Campus life at Vignan University is vibrant, inclusive, and dynamic! We offer a rich campus life that balances academics with personal growth. Students can participate in various clubs, major events, leadership opportunities, and creative expression activities. The campus culture promotes creativity, innovation, collaboration, and holistic development."
+
+  utter_events:
+  - text: "Vignan University hosts numerous exciting events throughout the year! Major events include the Annual Cultural Fest, Tech Fest, Sports Meet, Literary Fest, Alumni Meet, Freshers' Welcome, and Farewell Events. Each vertical also organizes specific events like hackathons, art exhibitions, debate competitions, and cultural performances."
+
+  utter_rankings:
+  - text: "Vignan University has excellent NIRF rankings:\n\n🏆 Top 70 Universities in India\n🏆 Top 80 Colleges in India\n\nThese rankings reflect our commitment to academic excellence, quality infrastructure, experienced faculty, and outstanding student outcomes."
+
+  utter_admissions:
+  - text: "For admission information at Vignan University, I recommend:\n\n• Visit our official website for detailed admission procedures\n• Contact the admissions office directly\n• Check our NIRF rankings and academic programs\n• Explore our vibrant campus life and student bodies\n• Learn about our excellent placement record\n\nWould you like to know more about our academic programs, campus life, or student organizations?"
+
+  utter_benefits:
+  - text: "There are numerous compelling reasons to join Vignan University! Academically, we're ranked among the top 70 universities and top 80 colleges in India with experienced faculty and modern curriculum. Our campus offers holistic development through multiple student bodies, cultural opportunities, sports programs, and leadership development. We have an excellent placement record with strong industry partnerships and alumni network support."
+
+  utter_campus_spots:
+  - text: "Vignan University has several iconic spots including:\n\n• U Block - The central hub for student activities\n• MHP Canteen - Heart of campus social life\n• Various academic blocks and facilities\n\nWould you like to know about specific locations?"
+
+  utter_verticals:
+  - text: "SAC has 8 main verticals:\n\n1. Culturals - Dance, Music & Theatre Arts\n2. Literary - Readers, Writers & Orators\n3. Fine Arts - Arts, Crafts & Ambience\n4. Public Relations & Digital Marketing\n5. Technical Design\n6. Logistics\n7. Stage Management\n8. Photography\n\nEach vertical focuses on specific skills and activities. Students can join any vertical based on their interests!"
+
+  utter_achievements:
+  - text: "Vignan University has numerous impressive achievements! We're consistently ranked among the top 70 universities and top 80 colleges in India according to NIRF rankings. Our students regularly win national and international hackathons and coding competitions. In cultural competitions, Vignan students consistently win awards in dance, music, drama, and other cultural events. Our sports teams regularly win championships in various sports disciplines."
+
+  utter_contact:
+  - text: "You can contact Vignan University through:\n\n• Official website for general information\n• Admissions office for admission queries\n• Student affairs office for campus life questions\n• Specific departments for academic inquiries\n\nI can also help you with information about our programs, campus life, and student organizations!"
+
+  utter_help:
+  - text: "I can help you with information about:\n\n• Student bodies and organizations (SAC, Entrepreneurship Cell, etc.)\n• Campus life and famous spots (U Block, MHP Canteen)\n• Academic programs and NIRF rankings\n• Events and activities\n• Admissions and benefits\n\nWhat would you like to know?"
+
+actions:
+  - action_get_student_body_info
+  - action_get_vertical_info
+  - action_get_campus_spot_info
+
+session_config:
+  session_expiration_time: 60
+  carry_over_slots_to_new_session: true

@@ -1,0 +1,250 @@
+version: "3.1"
+
+nlu:
+- intent: greet
+  examples: |
+    - hello
+    - hi
+    - hey
+    - good morning
+    - good afternoon
+    - good evening
+    - greetings
+    - hi there
+    - hello there
+    - hey there
+    - hiya
+    - howdy
+    - sup
+    - whats up
+    - what's up
+    - yo
+    - good day
+    - good night
+    - morning
+    - afternoon
+    - evening
+
+- intent: goodbye
+  examples: |
+    - bye
+    - goodbye
+    - see you
+    - take care
+    - farewell
+    - see you later
+    - catch you later
+    - talk to you later
+    - have a good day
+    - have a great day
+
+- intent: affirm
+  examples: |
+    - yes
+    - yeah
+    - yep
+    - sure
+    - of course
+    - absolutely
+    - definitely
+    - correct
+    - right
+    - that's right
+
+- intent: deny
+  examples: |
+    - no
+    - nope
+    - not really
+    - not at all
+    - no way
+    - never
+    - I don't think so
+    - that's not right
+    - incorrect
+    - wrong
+
+- intent: mood_great
+  examples: |
+    - perfect
+    - great
+    - amazing
+    - wonderful
+    - I am feeling very good
+    - I am great
+    - I'm good
+    - excellent
+    - marvelous
+    - fantastic
+
+- intent: mood_unhappy
+  examples: |
+    - sad
+    - very sad
+    - unhappy
+    - bad
+    - very bad
+    - awful
+    - terrible
+    - not very good
+    - extremely sad
+    - so sad
+
+- intent: bot_challenge
+  examples: |
+    - are you a bot?
+    - are you a human?
+    - am I talking to a bot?
+    - am I talking to a human?
+
+- intent: ask_about_university
+  examples: |
+    - tell me about vignan university
+    - what is vignan university
+    - about vignan
+    - university information
+    - college information
+    - tell me about the university
+    - what can you tell me about vignan
+    - vignan university details
+    - about the college
+    - university overview
+
+- intent: ask_about_student_bodies
+  examples: |
+    - what student bodies are there
+    - tell me about student organizations
+    - what organizations can I join
+    - student bodies
+    - student organizations
+    - clubs and societies
+    - what clubs are available
+    - list student bodies
+    - show me student organizations
+    - what groups can I join
+
+- intent: ask_about_sac
+  examples: |
+    - what is sac
+    - tell me about sac
+    - student activities council
+    - sac information
+    - what does sac do
+    - sac details
+    - student council
+    - activities council
+
+- intent: ask_about_campus_life
+  examples: |
+    - campus life
+    - student life
+    - life at vignan
+    - what is campus life like
+    - tell me about campus life
+    - student activities
+    - campus activities
+    - what do students do
+    - campus culture
+
+- intent: ask_about_events
+  examples: |
+    - what events happen
+    - tell me about events
+    - campus events
+    - what fests are there
+    - annual events
+    - cultural events
+    - tech events
+    - sports events
+    - what competitions are there
+
+- intent: ask_about_rankings
+  examples: |
+    - nirf rankings
+    - university rankings
+    - college rankings
+    - what is the ranking
+    - nirf
+    - ranking
+    - rankings
+    - top universities
+    - top colleges
+
+- intent: ask_about_admissions
+  examples: |
+    - admission process
+    - how to apply
+    - admission requirements
+    - admission criteria
+    - how to get admission
+    - admission procedure
+    - apply to vignan
+    - admission information
+    - how to join
+
+- intent: ask_about_benefits
+  examples: |
+    - why choose vignan
+    - benefits of vignan
+    - advantages of vignan
+    - why vignan
+    - what are the benefits
+    - why should I join
+    - reasons to choose vignan
+    - what makes vignan special
+
+- intent: ask_about_campus_spots
+  examples: |
+    - famous spots
+    - campus spots
+    - u block
+    - mhp canteen
+    - campus landmarks
+    - places on campus
+    - campus locations
+    - where to go on campus
+    - campus places
+
+- intent: ask_about_verticals
+  examples: |
+    - sac verticals
+    - what are the verticals
+    - tell me about verticals
+    - sac clubs
+    - verticals under sac
+    - all verticals
+    - list verticals
+    - sac departments
+
+- intent: ask_about_achievements
+  examples: |
+    - achievements
+    - awards
+    - wins
+    - accomplishments
+    - success stories
+    - what has vignan achieved
+    - university achievements
+    - college achievements
+
+- intent: ask_about_contact
+  examples: |
+    - contact information
+    - how to contact
+    - phone number
+    - email
+    - address
+    - contact details
+    - get in touch
+    - reach out
+
+- intent: ask_about_help
+  examples: |
+    - help
+    - what can you do
+    - how can you help
+    - what do you know
+    - options
+    - assist
+    - support
+    - guide me

@@ -1,0 +1,22 @@
+version: "3.1"
+
+rules:
+- rule: say goodbye
+  steps:
+  - intent: goodbye
+  - action: utter_goodbye
+
+- rule: say 'I am a bot'
+  steps:
+  - intent: bot_challenge
+  - action: utter_iamabot
+
+- rule: greet user
+  steps:
+  - intent: greet
+  - action: utter_greet
+
+- rule: ask for help
+  steps:
+  - intent: ask_about_help
+  - action: utter_help
