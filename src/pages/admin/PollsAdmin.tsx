@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { io, Socket } from 'socket.io-client';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { apiFetch, createPoll, deletePoll, activatePoll, deactivatePoll } from '../../lib/api';
+import { votingSocket } from '../../services/voting-socket';
 
 interface PollOption { _id: string; text: string; votes: number; }
 interface Poll { _id: string; title: string; description?: string; options: PollOption[]; totalVotes: number; endDate?: string; createdAt?: string; isActive?: boolean; visibleAt?: string; }
@@ -32,42 +32,26 @@ const PollsAdmin: React.FC = () => {
   };
 
   useEffect(() => {
-    let s: Socket | null = null;
-    let intervalId: any = null;
-
-    // initial load
+    // Initial load
     loadPolls();
 
-    // socket candidates
-    const socketBase = (import.meta.env.VITE_API_BASE as string || '').replace(/\/api\/?$/, '');
-    const candidates = [socketBase, 'http://localhost:4000', 'http://127.0.0.1:4000'].filter(Boolean);
-    let idx = 0;
-    const tryConnect = (url: string) => {
-      const client = io(url, { path: '/socket.io/' });
-      client.on('connect_error', () => {
-        if (idx < candidates.length - 1) {
-          idx += 1;
-          client.removeAllListeners();
-          client.disconnect();
-          tryConnect(candidates[idx]!);
-        }
+    // Set up real-time subscription for new polls
+    const unsubscribeNewPolls = votingSocket.subscribeToNewPolls((newPoll: Poll) => {
+      console.log('New poll received in admin:', newPoll);
+      setPolls(prevPolls => {
+        const exists = prevPolls.some(p => p._id === newPoll._id);
+        return exists ? prevPolls : [newPoll, ...prevPolls];
       });
-      client.on('polls:new', () => loadPolls());
-      client.on('polls:deleted', () => loadPolls());
-      client.on('polls:updated', () => loadPolls());
-      client.on('polls:visibility', () => loadPolls());
-      s = client;
-    };
-    try {
-      tryConnect(candidates[idx]!);
-    } catch {}
+    });
 
-    // polling fallback
-    intervalId = setInterval(() => loadPolls(), 10000);
+    // Polling fallback
+    const pollInterval = setInterval(loadPolls, 30000);
 
     return () => {
-      if (intervalId) clearInterval(intervalId);
-      if (s) { s.removeAllListeners(); s.disconnect(); }
+      clearInterval(pollInterval);
+      if (typeof unsubscribeNewPolls === 'function') {
+        unsubscribeNewPolls();
+      }
     };
   }, []);
 
@@ -83,12 +67,42 @@ const PollsAdmin: React.FC = () => {
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canCreate) return;
+    
     try {
       setLoading(true);
-      await createPoll({ title: title.trim(), description: description.trim() || undefined, options, endDate: endDate ? new Date(endDate).toISOString() : undefined });
-      setTitle(''); setDescription(''); setOptions([]); setEndDate('');
+      setError(null);
+      
+      // Format options for the API as strings
+      const pollOptions = options.map(o => o.trim()).filter(Boolean);
+      
+      // Create the poll
+      const newPoll = await createPoll({
+        title: title.trim(),
+        description: description.trim() || undefined,
+        options: pollOptions,
+        endDate: endDate ? new Date(endDate).toISOString() : undefined,
+      });
+      
+      // Immediately activate so students can see it
+      try {
+        await activatePoll(newPoll._id);
+      } catch (e) {
+        console.warn('Failed to auto-activate poll; activate manually if needed', e);
+      }
+      
+      // Reset form
+      setTitle('');
+      setDescription('');
+      setOptions([]);
+      setEndDate('');
+      
+      // Refresh list to reflect activation
       await loadPolls();
+      
+      // Note: server emits 'polls:new' and 'polls:visibility' via WebSocket
+      
     } catch (err: any) {
+      console.error('Failed to create poll:', err);
       setError(err.message || 'Failed to create poll');
     } finally {
       setLoading(false);

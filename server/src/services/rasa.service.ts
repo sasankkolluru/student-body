@@ -3,20 +3,29 @@ import axios from 'axios';
 export class RasaService {
   private rasaUrl: string;
   private isAvailable: boolean = false;
+  private maxRetries = 3;
+  private retryDelay = 2000; // 2 seconds
 
   constructor(rasaUrl: string = 'http://localhost:5005') {
     this.rasaUrl = rasaUrl;
     this.checkAvailability();
   }
 
-  private async checkAvailability(): Promise<void> {
+  private async checkAvailability(retryCount: number = 0): Promise<void> {
     try {
-      const response = await axios.get(`${this.rasaUrl}/health`, { timeout: 5000 });
+      const response = await axios.get(`${this.rasaUrl}/health`, { 
+        timeout: 5000 
+      });
       this.isAvailable = response.data.status === 'healthy';
       console.log(`Rasa service ${this.isAvailable ? 'available' : 'unavailable'}`);
     } catch (error) {
       this.isAvailable = false;
-      console.log('Rasa service unavailable, falling back to Node-NLP');
+      if (retryCount < this.maxRetries) {
+        console.log(`Rasa service unavailable, retrying in ${this.retryDelay/1000} seconds... (${retryCount + 1}/${this.maxRetries})`);
+        await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+        return this.checkAvailability(retryCount + 1);
+      }
+      console.log('Rasa service unavailable after retries, falling back to Node-NLP');
     }
   }
 

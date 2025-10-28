@@ -72,31 +72,47 @@ app.use('/api/events', eventsRoutes);
 app.use('/api/me', meRoutes);
 // Live news/scores (mounted at /api)
 app.use('/api', liveRoutes);
-
 // Health check
 app.get('/api/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', time: new Date().toISOString() });
 });
 
 // 404 for unknown /api routes
-app.use('/api', (req: Request, res: Response) => {
+app.use('/api', (req: Request, res: Response, next: any) => {
   res.status(404).json({ message: 'Route not found', path: req.path });
+  next();
 });
 
 // Global error handler to ensure JSON responses
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: any, _req: Request, res: Response, _next: any) => {
-  console.error('Unhandled error:', err);
-  const status = err.status || 500;
-  res.status(status).json({ message: err.message || 'Server error' });
-});
+    console.error('Unhandled error:', err);
+    const status = err.status || 500;
+    res.status(status).json({ message: err.message || 'Server error' });
+  });
 
-const PORT = process.env.PORT || 4000;
+const BASE_PORT = Number(process.env.PORT) || 4000;
+const MAX_RETRIES = Number(process.env.PORT_RETRY_LIMIT || 5);
 
-// Start server immediately so Socket.IO is available even if DB is slow/unavailable
-server.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Start server with automatic port retry if EADDRINUSE
+const tryListen = (port: number, attempt = 0) => {
+  // Attach one-time error handler for this attempt
+  server.once('error', (err: any) => {
+    if ((err as any)?.code === 'EADDRINUSE' && attempt < MAX_RETRIES) {
+      const nextPort = port + 1;
+      console.warn(`Port ${port} in use, trying ${nextPort}... (${attempt + 1}/${MAX_RETRIES})`);
+      setTimeout(() => tryListen(nextPort, attempt + 1), 300);
+    } else {
+      console.error('Server failed to start:', err);
+    }
+  });
+
+  server.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`);
+  });
+};
+
+tryListen(BASE_PORT);
 
 // Attempt DB connection asynchronously; log errors but do not exit
 connectDB()

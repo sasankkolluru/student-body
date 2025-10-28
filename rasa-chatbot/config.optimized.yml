@@ -1,0 +1,136 @@
+version: "3.1"
+
+language: en
+
+pipeline:
+  # Tokenization
+  - name: WhitespaceTokenizer
+    intent_tokenization_flag: true
+    intent_split_symbol: "_"
+  
+  # Featurization
+  - name: RegexFeaturizer
+  - name: LexicalSyntacticFeaturizer
+  - name: CountVectorsFeaturizer
+    analyzer: char_wb
+    min_ngram: 1
+    max_ngram: 4
+  - name: CountVectorsFeaturizer
+    min_ngram: 1
+    max_ngram: 2
+    analyzer: char_wb
+  
+  # Intent Classification & Entity Extraction
+  - name: DIETClassifier
+    epochs: 100
+    constrain_similarities: true
+    BILOU_flag: true
+    learning_rate: 0.001
+    hidden_layers_sizes:
+      text: [256, 128]
+    dropout: 0.2
+    weight_sparsity: 0.8
+  
+  # Response Selection
+  - name: ResponseSelector
+    epochs: 100
+    constrain_similarities: true
+    hidden_layers_sizes:
+      text: [256, 128]
+      label: [20, 20]
+    dropout: 0.2
+    weight_sparsity: 0.8
+  
+  # Fallback and Policies
+  - name: FallbackClassifier
+    threshold: 0.3
+    ambiguity_threshold: 0.1
+  - name: EntitySynonymMapper
+
+policies:
+  # Rule-based policies
+  - name: RulePolicy
+    core_fallback_threshold: 0.4
+    core_fallback_action_name: "action_default_fallback"
+    enable_fallback_prediction: true
+  
+  # Machine Learning policies
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 200
+    constrain_similarities: true
+    batch_size: [32, 64]
+    learning_rate: 0.001
+    hidden_layers_sizes:
+      text: [256, 128]
+      action: [64, 32]
+    dropout: 0.2
+    weight_sparsity: 0.8
+  
+  # For handling unexpected inputs
+  - name: UnexpecTEDIntentPolicy
+    max_history: 5
+    epochs: 100
+    hidden_layers_sizes:
+      text: [256, 128]
+  
+  # For memorization of training examples
+  - name: MemoizationPolicy
+    max_history: 5
+
+# Custom components and configurations
+recipe: default.v1
+assistant_id: student_body_assistant
+
+# Response caching for better performance
+caches:
+  response_cache:
+    type: redis
+    url: ${REDIS_URL:redis://localhost:6379}
+    key_prefix: rasa:response_cache:
+    ttl: 3600  # 1 hour
+
+# Model configuration
+model:
+  # Enable incremental training
+  incremental_training: true
+  # Enable model compression
+  compression: true
+  # Enable model pruning
+  pruning_enabled: true
+  pruning_final_sparsity: 0.8
+
+# Endpoint configuration
+endpoints:
+  # Redis for tracker store
+  tracker_store:
+    type: redis
+    url: ${REDIS_URL:redis://localhost:6379}
+    key_prefix: rasa:tracker:
+    record_exp: 86400  # 24 hours
+  
+  # Redis for lock store
+  lock_store:
+    type: redis
+    url: ${REDIS_URL:redis://localhost:6379}
+    key_prefix: rasa:lock:
+  
+  # Redis for event broker
+  event_broker:
+    type: redis
+    url: ${REDIS_URL:redis://localhost:6379}
+    key_prefix: rasa:events:
+    event_ttl: 604800  # 1 week
+
+# Logging configuration
+log_level: INFO
+log_file: logs/rasa.log
+
+# Performance optimization
+max_number_of_retrieval_intents: 10
+num_workers: 4  # Adjust based on CPU cores
+
+# Session configuration
+session_config:
+  session_expiration_time: 60  # minutes
+  carry_over_slots_to_new_session: true

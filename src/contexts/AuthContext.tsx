@@ -3,6 +3,23 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { apiFetch, setAuthToken, clearAuthToken, getAuthToken } from '../lib/api';
 
+// Predefined admin accounts
+const PREDEFINED_ADMINS = [
+  { email: 'admin1@college.edu', password: 'Admin@12345', name: 'Admin One' },
+  { email: 'admin2@college.edu', password: 'Admin@23456', name: 'Admin Two' },
+  { email: 'admin3@college.edu', password: 'Admin@34567', name: 'Admin Three' },
+  { email: 'admin4@college.edu', password: 'Admin@45678', name: 'Admin Four' },
+  { email: 'admin5@college.edu', password: 'Admin@56789', name: 'Admin Five' }
+];
+
+// Mock function to verify admin credentials
+const verifyAdminCredentials = (email: string, password: string) => {
+  return PREDEFINED_ADMINS.find(admin => 
+    admin.email.toLowerCase() === email.toLowerCase() && 
+    admin.password === password
+  );
+};
+
 type UserRole = 'admin' | 'student' | null;
 
 interface User {
@@ -52,7 +69,7 @@ interface AuthContextType {
   loading: boolean;
   error: string | null;
   login: (credentials: LoginCredentials) => Promise<void>;
-  register: (data: RegisterData) => Promise<void>;
+  register: (data: RegisterData) => Promise<User>;
   logout: () => void;
   updateProfile: (data: Partial<User>) => Promise<void>;
   resetPassword: (email: string) => Promise<void>;
@@ -114,6 +131,34 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       setLoading(true);
       setError(null);
+      
+      // For admin login, check against predefined admins first
+      if (role === 'admin') {
+        const admin = verifyAdminCredentials(email, password);
+        if (!admin) {
+          throw new Error('Invalid admin credentials. Please check your email and password.');
+        }
+        
+        // For mock purposes, create a user object for the admin
+        const mockAdminUser: User = {
+          id: `admin-${email}`,
+          email: admin.email,
+          name: admin.name,
+          role: 'admin',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+        
+        // In a real app, you would get a token from your backend
+        setUser(mockAdminUser);
+        if (rememberMe) localStorage.setItem(AUTH_KEYS.REMEMBER_ME, 'true');
+        toast.success(`Welcome back, ${mockAdminUser.name}!`);
+        const redirectPath = location.state?.from?.pathname || '/admin/dashboard';
+        navigate(redirectPath, { replace: true });
+        return;
+      }
+      
+      // For student login, use the normal login flow
       const res = await apiFetch<{ token: string; user: User }>(
         '/auth/login',
         {
@@ -121,15 +166,59 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           body: JSON.stringify({ email, password, role }),
         }
       );
+      
       setAuthToken(res.token);
       setUser(res.user);
       if (rememberMe) localStorage.setItem(AUTH_KEYS.REMEMBER_ME, 'true');
       toast.success(`Welcome back, ${res.user.name}!`);
-      const redirectPath = location.state?.from?.pathname || (res.user.role === 'admin' ? '/admin/dashboard' : '/dashboard');
+      const redirectPath = location.state?.from?.pathname || '/dashboard';
       navigate(redirectPath, { replace: true });
     } catch (err: any) {
       console.error('Login error:', err);
       setError(err.message || 'Failed to log in. Please check your credentials.');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const register = async (data: RegisterData) => {
+    setLoading(true);
+    setError(null);
+    
+    // Prevent admin registration through the UI
+    if (data.role === 'admin') {
+      const errorMsg = 'Admin registration is not allowed. Please contact system administrator.';
+      setError(errorMsg);
+      throw new Error(errorMsg);
+    }
+    
+    try {
+      const res = await apiFetch<{ token: string; user: User }>(
+        '/auth/register',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            name: data.name,
+            email: data.email,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+            role: 'student', // Force role to be student
+            regdNo: data.regdNo,
+            branch: data.branch,
+            stream: data.stream,
+            year: data.year,
+            phone: data.phone,
+          }),
+        }
+      );
+      setAuthToken(res.token);
+      setUser(res.user);
+      toast.success(`Welcome to Student Portal, ${res.user.name}!`);
+      return res.user;
+    } catch (err: any) {
+      console.error('Registration error:', err);
+      setError(err.message || 'Failed to register. Please try again.');
       throw err;
     } finally {
       setLoading(false);
@@ -144,39 +233,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     loading,
     error,
     login,
-    register: async (data: RegisterData) => {
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await apiFetch<{ token: string; user: User }>(
-          '/auth/register',
-          {
-            method: 'POST',
-            body: JSON.stringify({
-              name: data.name,
-              email: data.email,
-              password: data.password,
-              role: data.role,
-              regdNo: data.regdNo,
-              employeeId: data.employeeId,
-              branch: data.branch,
-              stream: data.stream,
-              year: data.year,
-              phone: data.phone,
-            }),
-          }
-        );
-        setAuthToken(res.token);
-        setUser(res.user);
-        toast.success(`Welcome to Student Portal, ${res.user.name}!`);
-      } catch (err: any) {
-        console.error('Registration error:', err);
-        setError(err.message || 'Failed to register. Please try again.');
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
+    register,
     logout: () => {
       setUser(null);
       clearAuthToken();

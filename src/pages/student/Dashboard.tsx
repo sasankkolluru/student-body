@@ -6,21 +6,21 @@ import {
   CheckCircle, 
   XCircle, 
   Bell, 
-  User, 
   LogOut,
-  AlertCircle,
   CheckCircle2,
   X,
   Users,
   Download,
-  Search
+  Search,
+  Trophy,
+  Vote
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import * as XLSX from 'xlsx';
 import { listMyAchievements, type AchievementItem } from '../../lib/api';
+import { VotingTab } from './VotingTab';
 
 interface Event {
   id: string;
@@ -44,12 +44,11 @@ interface Notification {
 
 const StudentDashboard = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();
   const [events, setEvents] = useState<Event[]>([]);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showRegistrationForm, setShowRegistrationForm] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [activeTab, setActiveTab] = useState('events');
+  const [activeTab, setActiveTab] = useState('voting');
   // Achievements state
   const [achievements, setAchievements] = useState<AchievementItem[]>([]);
   const [achLoading, setAchLoading] = useState(false);
@@ -251,12 +250,8 @@ const StudentDashboard = () => {
     e.preventDefault();
     
     // In a real app, this would be an API call
-    const registrationData = {
-      eventId: selectedEvent?.id,
-      ...formData,
-      registrationDate: new Date().toISOString(),
-      status: 'pending' as const,
-    };
+    // The form data is submitted directly to update the UI state
+    // In a real implementation, this would be sent to an API endpoint
 
     // Update the event to show as registered
     setEvents(events.map(event => 
@@ -406,33 +401,56 @@ const StudentDashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Tabs */}
         <div className="border-b border-gray-200 mb-6">
-          <nav className="-mb-px flex space-x-8">
+          <nav className="-mb-px flex space-x-4 overflow-x-auto pb-1">
+            <button
+              onClick={() => setActiveTab('voting')}
+              className={`${activeTab === 'voting' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm flex items-center`}
+            >
+              <Vote className="h-4 w-4 mr-1.5" />
+              Voting
+            </button>
             <button
               onClick={() => setActiveTab('events')}
-              className={`${activeTab === 'events' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={`${activeTab === 'events' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm flex items-center`}
             >
+              <Calendar className="h-4 w-4 mr-1.5" />
               Events
             </button>
             <button
               onClick={() => setActiveTab('registered')}
-              className={`${activeTab === 'registered' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={`${activeTab === 'registered' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm flex items-center`}
             >
+              <CheckCircle className="h-4 w-4 mr-1.5" />
               My Registrations
             </button>
             <button
               onClick={() => setActiveTab('notifications')}
-              className={`${activeTab === 'notifications' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={`${activeTab === 'notifications' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm flex items-center`}
             >
+              <Bell className="h-4 w-4 mr-1.5" />
               Notifications
+              {unreadNotifications > 0 && (
+                <span className="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  {unreadNotifications}
+                </span>
+              )}
             </button>
             <button
               onClick={() => setActiveTab('achievements')}
-              className={`${activeTab === 'achievements' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm`}
+              className={`${activeTab === 'achievements' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'} whitespace-nowrap py-4 px-2 border-b-2 font-medium text-sm flex items-center`}
             >
+              <Trophy className="h-4 w-4 mr-1.5" />
               Achievements
             </button>
           </nav>
         </div>
+
+        {/* Voting Tab */}
+        {activeTab === 'voting' && (
+          <div className="bg-white shadow overflow-hidden sm:rounded-lg p-6">
+            <VotingTab />
+          </div>
+        )}
 
         {/* Events Tab */}
         {activeTab === 'events' && (
