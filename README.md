@@ -4,14 +4,17 @@ A comprehensive student portal for managing college activities, events, achievem
 
 ## Features
 
-- **User Authentication**: Login/Register with different roles (Admin/Student)
+- **User Authentication**: Secure login/register with different roles (Admin/Student)
 - **Student Bodies**: Information about various student councils and clubs
-- **Events**: View and manage college events
+- **Events**: View and manage college events with calendar integration
 - **Gallery**: Photo gallery for college events and activities
 - **News & Scores**: Latest news and live sports scores
-- **Achievements**: Track and showcase student achievements
-- **Voting**: Participate in college elections and polls
-- **Ideas**: Share and discuss ideas with the community
+- **Achievements**: Track and showcase student achievements with verification
+- **Voting System**: Secure voting for college elections and opinion polls
+- **Idea Hub**: Share, discuss, and upvote ideas with the community
+- **Real-time Chat**: Direct messaging and group chats for better communication
+- **Analytics Dashboard**: Track engagement and participation metrics
+- **Responsive Design**: Works seamlessly on all devices
 
 ## Tech Stack
 
@@ -22,6 +25,15 @@ A comprehensive student portal for managing college activities, events, achievem
 - React Router
 - Framer Motion (Animations)
 - Lucide Icons
+
+## Security Notice
+
+**Important:** For security reasons, the admin access is restricted to pre-authorized email addresses only. Please note:
+
+- Only 5 specific email addresses have admin privileges
+- Do not share admin credentials in the code or documentation
+- Never commit sensitive information like passwords or API keys to version control
+- For local development, use the `.env` file (added to `.gitignore`) to store sensitive information
 
 ## Getting Started
 
@@ -71,15 +83,23 @@ A comprehensive student portal for managing college activities, events, achievem
 
 ```
 src/
-├── components/       # Reusable components
-├── contexts/         # React contexts
-├── data/             # Mock data and constants
-├── lib/              # Utility functions and configurations
-├── pages/            # Page components
-│   ├── admin/        # Admin pages
-│   ├── student/      # Student pages
-│   └── ...           # Other pages
-└── types/            # TypeScript type definitions
+├── components/           # Reusable UI components
+│   ├── admin/           # Admin-specific components
+│   ├── analytics/       # Analytics and chart components
+│   ├── chat/            # Chat interface components
+│   └── ui/              # Base UI components
+├── contexts/            # React context providers
+├── data/                # Mock data and constants
+├── hooks/               # Custom React hooks
+├── lib/                 # Utility functions and configurations
+├── pages/               # Page components
+│   ├── admin/           # Admin dashboard and management pages
+│   ├── analytics/       # Data visualization pages
+│   ├── student/         # Student-facing pages
+│   └── ...              # Other pages
+├── services/            # API and service integrations
+├── types/               # TypeScript type definitions
+└── utils/               # Helper utilities
 ```
 
 ## Deployment
